@@ -38,13 +38,30 @@ for cat in resultCats:
 
     urlCategory = requests.get(urlCat)
     soupCategory = BeautifulSoup(urlCategory.content, "html.parser")
-    prodCategories = soupCategory.find_all("a",class_="product_image")
-
-    for pc in prodCategories:
-        #print(pc["href"])
-        getResult(pc["href"],categoryName)
+    pagCategory = soupCategory.find("ul",class_="pagination")
+    if pagCategory:
+        pagination = []
+        for p in pagCategory:
+            try:
+                pagination.append(int(p.text))
+            except:
+                print("Anterior o siguiente")
+        for pa in range(1,pagination[-1]+1,1):
+            numPagination = urlCat+"?p="+str(pa)
+            urlPagCategories = requests.get(numPagination)
+            soupCategoryPagi = BeautifulSoup(urlPagCategories.content, "html.parser")
+            prodCategoriesPagi = soupCategoryPagi.find_all("a",class_="product_image")
+            #print(numPagination)
+            for pcg in prodCategoriesPagi:
+                print(pcg["href"])
+                getResult(pcg["href"],categoryName)
+    else:
+        print("Sin paginacion")
+        prodCategories = soupCategory.find_all("a",class_="product_image")
+        for pc in prodCategories:
+            print(pc["href"])
+            getResult(pc["href"],categoryName)
     
 
-    
-wb.save('./excel/lareynademesones.xlsx')    # Guardamos el Excel
+#wb.save('./excel/lareynademesones.xlsx')    # Guardamos el Excel
 
